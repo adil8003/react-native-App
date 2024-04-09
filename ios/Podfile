@@ -12,10 +12,14 @@ if RUBY_PLATFORM =~ /darwin/
 
   node_command = %Q{node -p "#{node_script.strip}" "#{__dir__}"}
 
-  react_native_pods_path, _ = Open3.capture2(node_command)
-  react_native_pods_path = react_native_pods_path.strip
+  begin
+    react_native_pods_path, _ = Open3.capture2(node_command)
+    react_native_pods_path = react_native_pods_path.strip
 
-  eval(File.read(react_native_pods_path))
+    eval(File.read(react_native_pods_path))
+  rescue StandardError => e
+    puts "Error resolving react_native_pods.rb: #{e.message}"
+  end
 end
 
 platform :ios, min_ios_version_supported
