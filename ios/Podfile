@@ -1,9 +1,22 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+# This code will only be executed on macOS, so we need to conditionally execute it.
+if RUBY_PLATFORM =~ /darwin/
+  require 'open3'
+
+  node_script = <<-EOS
+    require.resolve(
+      "react-native/scripts/react_native_pods.rb",
+      {paths: [process.argv[1]]},
+    )
+  EOS
+
+  node_command = %Q{node -p "#{node_script.strip}" "#{__dir__}"}
+
+  react_native_pods_path, _ = Open3.capture2(node_command)
+  react_native_pods_path = react_native_pods_path.strip
+
+  eval(File.read(react_native_pods_path))
+end
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
