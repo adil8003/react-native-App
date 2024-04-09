@@ -10,7 +10,7 @@ if RUBY_PLATFORM =~ /darwin/
     )
   EOS
 
-  node_command = %Q{node -p "#{node_script.strip}" "#{__dir__}"}
+  node_command = %Q{node -e "#{node_script.strip}" "#{__dir__}"}
 
   begin
     react_native_pods_path, _ = Open3.capture2(node_command)
